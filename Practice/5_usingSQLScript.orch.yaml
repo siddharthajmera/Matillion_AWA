@@ -1,0 +1,89 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start 0:
+      type: "start"
+      transitions:
+        unconditional:
+        - "SQL Script 0"
+      skipped: false
+      parameters:
+        componentName: "Start 0"
+    S3 Load - Student records:
+      type: "s3-load"
+      skipped: false
+      parameters:
+        componentName: "S3 Load - Student records"
+        stage: "Stage_AWS"
+        pattern: ".*"
+        encryption: "None"
+        warehouse: "COMPUTE_WH"
+        database: "DEMO_DB"
+        schema: "PUBLIC"
+        targetTable: "StudentRecord_2"
+        loadColumns:
+        - "RecordID"
+        - "StudentName"
+        - "Subject"
+        - "Marks"
+        - "Year"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter: ""
+        fieldDelimiter: ","
+        skipHeader: "1"
+        skipBlankLines: "False"
+        dateFormat: ""
+        timeFormat: ""
+        timestampFormat: ""
+        escape: ""
+        escapeUnenclosedField: ""
+        trimSpace: "False"
+        fieldOptionallyEnclosed: ""
+        nullIf:
+        errorOnColumnCountMismatch: "False"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType: ""
+        onError: "Abort Statement"
+        sizeLimitB: ""
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "True"
+        metadataFields:
+    SQL Script 0:
+      type: "sql-script"
+      transitions:
+        unconditional:
+        - "S3 Load - Student records"
+      skipped: false
+      parameters:
+        componentName: "SQL Script 0"
+        sqlScript: |
+          USE DEMO_DB;
+          CREATE TABLE StudentRecords_script (
+              RecordID INT PRIMARY KEY ,  -- Unique identifier for each record
+              StudentName VARCHAR(100) NOT NULL,       -- Name of the student
+              Subject VARCHAR(100) NOT NULL,           -- Subject of the exam
+              Marks INT NOT NULL,                      -- Marks obtained by the student
+              Year INT NOT NULL                        -- Year in which the marks were obtained
+          );
+design:
+  components:
+    Start 0:
+      position:
+        x: -416
+        "y": 16
+      tempMetlId: 1501
+    S3 Load - Student records:
+      position:
+        x: -160
+        "y": 16
+      tempMetlId: 1503
+    SQL Script 0:
+      position:
+        x: -310
+        "y": 12
+      tempMetlId: 1518

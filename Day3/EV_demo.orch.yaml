@@ -1,0 +1,85 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    'Start ':
+      type: "start"
+      transitions:
+        unconditional:
+        - "S3 Load 0"
+      skipped: false
+      parameters:
+        componentName: "Start "
+    S3 Load 0:
+      type: "s3-load"
+      transitions:
+        success:
+        - "Python Script 0"
+      skipped: false
+      parameters:
+        componentName: "S3 Load 0"
+        stage: "Stage_AWS"
+        pattern: ".*"
+        encryption: "None"
+        warehouse: "COMPUTE_WH"
+        database: "${EV_DBNAME}"
+        schema: "${EV_SCHEMANAME}"
+        targetTable: "${EV_TABLENAME}"
+        loadColumns:
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter: ""
+        fieldDelimiter: ","
+        skipHeader: "1"
+        skipBlankLines: "False"
+        dateFormat: ""
+        timeFormat: ""
+        timestampFormat: ""
+        escape: ""
+        escapeUnenclosedField: ""
+        trimSpace: "False"
+        fieldOptionallyEnclosed: ""
+        nullIf:
+        errorOnColumnCountMismatch: "False"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType: ""
+        onError: "Abort Statement"
+        sizeLimitB: ""
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "True"
+        metadataFields:
+    Python Script 0:
+      type: "python-script"
+      skipped: false
+      parameters:
+        componentName: "Python Script 0"
+        script: "###\n# Variables are directly accessible: \n#   print (myvar)\n#\
+          \ Updating a variable:\n#   context.updateVariable('myvar', 'new-value')\n\
+          # Grid Variables are accessible via the context:\n#   print (context.getGridVariable('mygridvar'))\n\
+          # Updating a grid variable:\n#   context.updateGridVariable('mygridvar',\
+          \ [['list','of'],['lists','!']])\n# A database cursor can be accessed from\
+          \ the context (Jython only):\n#   cursor = context.cursor()\n#   cursor.execute('select\
+          \ count(*) from mytable')\n#   rowcount = cursor.fetchone()[0]\n###\nprint(project_name)\n\
+          print(environment_name)\nprint(job_id)\nprint(task_id)"
+        interpreter: "Python 3"
+        timeout: "360"
+design:
+  components:
+    'Start ':
+      position:
+        x: -432
+        "y": -16
+      tempMetlId: 2344
+    S3 Load 0:
+      position:
+        x: -320
+        "y": -16
+      tempMetlId: 2345
+    Python Script 0:
+      position:
+        x: -190
+        "y": -14
+      tempMetlId: 2878

@@ -1,0 +1,173 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start 0:
+      type: "start"
+      transitions:
+        unconditional:
+        - "Create Table 0"
+      skipped: false
+      parameters:
+        componentName: "Start 0"
+    Create Table 0:
+      type: "create-table-v2"
+      transitions:
+        unconditional:
+        - "S3 Load - Student records"
+      skipped: false
+      parameters:
+        componentName: "Create Table 0"
+        createMethod: "Create if not exists"
+        database: "DEMO_DB"
+        schema: "PUBLIC"
+        table: "StudentRecord_2"
+        snowflakeTableType: "Permanent"
+        columns:
+        - - "RecordID"
+          - "NUMBER"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "StudentName"
+          - "VARCHAR"
+          - "100"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Subject"
+          - "VARCHAR"
+          - "50"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Marks"
+          - "NUMBER"
+          -
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Year"
+          - "NUMBER"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        defaultDdlCollation: ""
+        primaryKeys:
+        - "RecordID"
+        clusteringKeys:
+        dataRetentionTimeInDays: ""
+        comment: ""
+    S3 Load - Student records:
+      type: "s3-load"
+      transitions:
+        success:
+        - "Truncate Table 0"
+      skipped: false
+      parameters:
+        componentName: "S3 Load - Student records"
+        stage: "Stage_AWS"
+        pattern: ".*"
+        encryption: "None"
+        warehouse: "COMPUTE_WH"
+        database: "DEMO_DB"
+        schema: "PUBLIC"
+        targetTable: "StudentRecord_2"
+        loadColumns:
+        - "RecordID"
+        - "StudentName"
+        - "Subject"
+        - "Marks"
+        - "Year"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter: ""
+        fieldDelimiter: ","
+        skipHeader: "1"
+        skipBlankLines: "False"
+        dateFormat: ""
+        timeFormat: ""
+        timestampFormat: ""
+        escape: ""
+        escapeUnenclosedField: ""
+        trimSpace: "False"
+        fieldOptionallyEnclosed: ""
+        nullIf:
+        errorOnColumnCountMismatch: "False"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType: ""
+        onError: "Abort Statement"
+        sizeLimitB: ""
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "True"
+        metadataFields:
+    Truncate Table 0:
+      type: "truncate-table"
+      transitions:
+        success:
+        - "Delete Tables 0"
+      skipped: false
+      parameters:
+        componentName: "Truncate Table 0"
+        warehouse: "COMPUTE_WH"
+        database: "DEMO_DB"
+        schema: "PUBLIC"
+        targetTable:
+        - "STUDENTRECORDS"
+    Delete Tables 0:
+      type: "delete-tables"
+      skipped: false
+      parameters:
+        componentName: "Delete Tables 0"
+        database: "DEMO_DB"
+        schema: "PUBLIC"
+        targetTable:
+        - "STUDENTRECORDS"
+        ignoreMissing: "Yes"
+design:
+  components:
+    Start 0:
+      position:
+        x: -416
+        "y": 16
+      tempMetlId: 1363
+    Create Table 0:
+      position:
+        x: -310
+        "y": 14
+      tempMetlId: 1364
+    S3 Load - Student records:
+      position:
+        x: -160
+        "y": 16
+      tempMetlId: 1365
+    Truncate Table 0:
+      position:
+        x: 0
+        "y": 16
+      tempMetlId: 1371
+    Delete Tables 0:
+      position:
+        x: 132
+        "y": 12
+      tempMetlId: 1423

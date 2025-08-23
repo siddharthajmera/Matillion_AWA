@@ -1,0 +1,89 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    BOOKS2:
+      type: "table-input"
+      parameters:
+        componentName: "BOOKS2"
+        database: "DEMO_DATABASE"
+        schema: "DEMO_SCHEMA"
+        targetTable: "BOOKS2"
+        columnNames:
+        - "ID"
+        - "NAME"
+        - "CATEGORY"
+        - "PRICE"
+        timeOffset: ""
+    BOOKS1:
+      type: "table-input"
+      parameters:
+        componentName: "BOOKS1"
+        database: "DEMO_DATABASE"
+        schema: "DEMO_SCHEMA"
+        targetTable: "BOOKS1"
+        columnNames:
+        - "ID"
+        - "NAME"
+        - "CATEGORY"
+        - "PRICE"
+        timeOffset: ""
+    Detect Changes:
+      type: "detect-changes"
+      sources:
+      - "BOOKS2"
+      - "BOOKS1"
+      parameters:
+        componentName: "Detect Changes"
+        masterTable: "BOOKS1"
+        matchKeys:
+        - "ID"
+        compareColumns:
+        - "ID"
+        - "NAME"
+        - "CATEGORY"
+        - "PRICE"
+        outputColumnMapping:
+        - - "master_ID"
+          - "master_ID"
+        - - "compare_ID"
+          - "compare_ID"
+        - - "master_NAME"
+          - "Name"
+        - - "master_CATEGORY"
+          - "Category"
+        - - "master_PRICE"
+          - "Master_Price"
+        - - "compare_PRICE"
+          - "Compare_Price"
+        indicatorColumn: "Indicator"
+    Pivot 0:
+      type: "pivot"
+      parameters:
+        componentName: "Pivot 0"
+        aggregateFunction: "Average"
+        pivotColumn:
+        valueColumn:
+        pivotValues:
+design:
+  components:
+    BOOKS2:
+      position:
+        x: 368
+        "y": 224
+      tempMetlId: 5378
+    BOOKS1:
+      position:
+        x: 368
+        "y": 94
+      tempMetlId: 5379
+    Detect Changes:
+      position:
+        x: 594
+        "y": 165
+      tempMetlId: 5380
+    Pivot 0:
+      position:
+        x: 1440
+        "y": -32
+      tempMetlId: 5381

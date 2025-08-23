@@ -1,0 +1,101 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    TRANSACTIONS:
+      type: "table-input"
+      parameters:
+        componentName: "TRANSACTIONS"
+        database: "DEMO_DB"
+        schema: "MY_BANKING"
+        targetTable: "TRANSACTIONS"
+        columnNames:
+        - "TRANS_ID"
+        - "ACCOUNT_ID"
+        - "TRANS_DATE"
+        - "TYPE"
+        - "OPERATION"
+        - "AMOUNT"
+        - "BALANCE"
+        - "PURPOSE"
+        - "BANK"
+        - "ACCOUNT_PARTNER_ID"
+        timeOffset: ""
+    Filter 0:
+      type: "filter"
+      sources:
+      - "TRANSACTIONS"
+      parameters:
+        componentName: "Filter 0"
+        filterConditions:
+        - - "TRANS_DATE"
+          - "Is"
+          - "Greater than"
+          - "${EV_STARTDATE}"
+        - - "TRANS_DATE"
+          - "Is"
+          - "Less than"
+          - "${EV_ENDDATE}"
+        combineCondition: "AND"
+  variables:
+    EV_DBNAME:
+      metadata:
+        type: "TEXT"
+        description: ""
+        scope: "SHARED"
+        visibility: "PUBLIC"
+      defaultValue: "DEMO_DB_DEV"
+    EV_ENDDATE:
+      metadata:
+        type: "TEXT"
+        description: "2020-12-31"
+        scope: "SHARED"
+        visibility: "PUBLIC"
+      defaultValue: "2020-12-31"
+    EV_STARTDATE:
+      metadata:
+        type: "TEXT"
+        description: "2020-11-30"
+        scope: "SHARED"
+        visibility: "PUBLIC"
+      defaultValue: "2020-11-30"
+    EV_TABLENAME:
+      metadata:
+        type: "TEXT"
+        description: ""
+        scope: "SHARED"
+        visibility: "PUBLIC"
+      defaultValue: "STUDENTRECORDS"
+    EV_SCHEMANAME:
+      metadata:
+        type: "TEXT"
+        description: ""
+        scope: "SHARED"
+        visibility: "PUBLIC"
+      defaultValue: "STUDENTDATA"
+    EV_BANK_TRANS_FILENAME:
+      metadata:
+        type: "TEXT"
+        description: "trnx_16"
+        scope: "SHARED"
+        visibility: "PUBLIC"
+      defaultValue: "trnx_16"
+    EV_BANK_TRANS_DIRECTORY:
+      metadata:
+        type: "TEXT"
+        description: "TRANSACTIONS"
+        scope: "SHARED"
+        visibility: "PUBLIC"
+      defaultValue: "TRANSACTIONS"
+design:
+  components:
+    TRANSACTIONS:
+      position:
+        x: 125
+        "y": 88
+      tempMetlId: 4366
+    Filter 0:
+      position:
+        x: 237
+        "y": 96
+      tempMetlId: 4416

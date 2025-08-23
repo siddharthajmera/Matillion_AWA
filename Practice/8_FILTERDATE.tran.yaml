@@ -1,0 +1,51 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    TRANSACTIONS:
+      type: "table-input"
+      parameters:
+        componentName: "TRANSACTIONS"
+        database: "DEMO_DB"
+        schema: "MY_BANKING"
+        targetTable: "TRANSACTIONS"
+        columnNames:
+        - "TRANS_ID"
+        - "ACCOUNT_ID"
+        - "TRANS_DATE"
+        - "TYPE"
+        - "OPERATION"
+        - "AMOUNT"
+        - "BALANCE"
+        - "PURPOSE"
+        - "BANK"
+        - "ACCOUNT_PARTNER_ID"
+        timeOffset: ""
+    Filter 0:
+      type: "filter"
+      sources:
+      - "TRANSACTIONS"
+      parameters:
+        componentName: "Filter 0"
+        filterConditions:
+        - - "TRANS_DATE"
+          - "Is"
+          - "Greater than"
+          - "${EV_STARTDATE}"
+        - - "TRANS_DATE"
+          - "Is"
+          - "Less than"
+          - "${EV_ENDDATE}"
+        combineCondition: "AND"
+design:
+  components:
+    TRANSACTIONS:
+      position:
+        x: 185
+        "y": 122
+      tempMetlId: 3830
+    Filter 0:
+      position:
+        x: 319
+        "y": 133
+      tempMetlId: 3910

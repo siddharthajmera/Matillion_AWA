@@ -1,0 +1,86 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Copy of Start 0:
+      type: "start"
+      transitions:
+        unconditional:
+        - "Copy of Create Table 0"
+      skipped: false
+      parameters:
+        componentName: "Copy of Start 0"
+    Copy of Create Table 0:
+      type: "create-table-v2"
+      skipped: false
+      parameters:
+        componentName: "Copy of Create Table 0"
+        createMethod: "Create if not exists"
+        database: "DEMO_DB"
+        schema: "PUBLIC"
+        table: "StudentRecord_2"
+        snowflakeTableType: "Permanent"
+        columns:
+        - - "RecordID"
+          - "NUMBER"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "StudentName"
+          - "VARCHAR"
+          - "100"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Subject"
+          - "VARCHAR"
+          - "50"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Marks"
+          - "NUMBER"
+          -
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Year"
+          - "NUMBER"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        defaultDdlCollation: ""
+        primaryKeys:
+        - "RecordID"
+        clusteringKeys:
+        dataRetentionTimeInDays: ""
+        comment: ""
+design:
+  components:
+    Copy of Start 0:
+      position:
+        x: 411
+        "y": 54
+      tempMetlId: 7592
+    Copy of Create Table 0:
+      position:
+        x: 523
+        "y": 54
+      tempMetlId: 7593

@@ -1,0 +1,67 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    'Start ':
+      type: "start"
+      transitions:
+        unconditional:
+        - "S3 Load 0"
+      skipped: false
+      parameters:
+        componentName: "Start "
+    S3 Load 0:
+      type: "s3-load"
+      skipped: false
+      parameters:
+        componentName: "S3 Load 0"
+        stage: "Stage_AWS"
+        pattern: ".*"
+        encryption: "None"
+        warehouse: "COMPUTE_WH"
+        database: "DEMO_DB"
+        schema: "STUDENTDATA"
+        targetTable: "STUDENTRECORDS"
+        loadColumns:
+        - "RECORDID"
+        - "STUDENTNAME"
+        - "SUBJECT"
+        - "MARKS"
+        - "YEAR"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter: ""
+        fieldDelimiter: ","
+        skipHeader: "1"
+        skipBlankLines: "False"
+        dateFormat: ""
+        timeFormat: ""
+        timestampFormat: ""
+        escape: ""
+        escapeUnenclosedField: ""
+        trimSpace: "False"
+        fieldOptionallyEnclosed: ""
+        nullIf:
+        errorOnColumnCountMismatch: "False"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType: ""
+        onError: "Abort Statement"
+        sizeLimitB: ""
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "True"
+        metadataFields:
+design:
+  components:
+    'Start ':
+      position:
+        x: -432
+        "y": -16
+      tempMetlId: 1620
+    S3 Load 0:
+      position:
+        x: -288
+        "y": -16
+      tempMetlId: 1632

@@ -1,0 +1,225 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    Generate Sequence 0:
+      type: "generate-sequence"
+      parameters:
+        componentName: "Generate Sequence 0"
+        startValue: "2010"
+        incrementValue: "1"
+        endValue: "2020"
+        outputColumn: "sequence"
+    Fixed Flow 0:
+      type: "fixed-flow"
+      parameters:
+        componentName: "Fixed Flow 0"
+        columns:
+        - - "Name"
+          - "VARCHAR"
+          -
+          - ""
+        - - "amt"
+          - "NUMBER"
+          -
+          - ""
+        - - "Paid"
+          - "NUMBER"
+          -
+          - ""
+        - - "Place"
+          - "VARCHAR"
+          - ""
+          - ""
+        values:
+        - - "Bob"
+          - "1000"
+          - "500"
+          - "A"
+        - - "Max"
+          - "700"
+          - "100"
+          - "A"
+        - - "Meenu"
+          - "900"
+          - "400"
+          - "B"
+        - - "Jobs"
+          - "100"
+          - "100"
+          - "B"
+        - - "Max"
+          - "200"
+          - "100"
+          - "A"
+        - - "Jobs"
+          - "800"
+          - "750"
+          - "B"
+    Aggregate 0:
+      type: "aggregate"
+      sources:
+      - "Fixed Flow 0"
+      parameters:
+        componentName: "Aggregate 0"
+        groupings:
+        aggregations:
+        - - "amt"
+          - "Sum"
+        groupingType: "Group By"
+    Aggregate_groupby:
+      type: "aggregate"
+      sources:
+      - "Fixed Flow 0"
+      parameters:
+        componentName: "Aggregate_groupby"
+        groupings:
+        - "Name"
+        aggregations:
+        - - "amt"
+          - "Sum"
+        groupingType: "Group By"
+    Aggregate_groupby_rollup:
+      type: "aggregate"
+      sources:
+      - "Fixed Flow 0"
+      parameters:
+        componentName: "Aggregate_groupby_rollup"
+        groupings:
+        - "Name"
+        aggregations:
+        - - "amt"
+          - "Sum"
+        groupingType: "Group By Rollup"
+    Calculator 0:
+      type: "calculator"
+      sources:
+      - "Generate Sequence 0"
+      parameters:
+        componentName: "Calculator 0"
+        includeInputColumns: "Yes"
+        calculations:
+        - - "\"sequence\"+4"
+          - "add4"
+    Cal_string:
+      type: "calculator"
+      sources:
+      - "Generate Sequence 0"
+      parameters:
+        componentName: "Cal_string"
+        includeInputColumns: "Yes"
+        calculations:
+        - - "CONCAT(TO_VARCHAR(\"sequence\"), '_Year')"
+          - "mul4"
+    Convert Type 0:
+      type: "convert-type"
+      sources:
+      - "Generate Sequence 0"
+      parameters:
+        componentName: "Convert Type 0"
+        conversions:
+        - - "sequence"
+          - "VARCHAR"
+          - ""
+          - ""
+    Distinct 0:
+      type: "distinct"
+      sources:
+      - "Fixed Flow 0"
+      parameters:
+        componentName: "Distinct 0"
+        columns:
+        - "Name"
+    Rename 0:
+      type: "rename"
+      sources:
+      - "Generate Sequence 0"
+      parameters:
+        componentName: "Rename 0"
+        columnMapping:
+        - - "sequence"
+          - "Year"
+        includeInputColumns: "No"
+    SQL 0:
+      type: "sql"
+      sources:
+      - "Cal_string"
+      parameters:
+        componentName: "SQL 0"
+        query: "Select COunt(*) from $T{Cal_string}"
+    Split Field 0:
+      type: "split-field"
+      sources:
+      - "Cal_string"
+      parameters:
+        componentName: "Split Field 0"
+        inputColumn: "mul4"
+        delimiter: "_"
+        outputColumns:
+        - - "1"
+          - "year"
+        - - "2"
+          - "text"
+        includeInputColumn: "True"
+design:
+  components:
+    Generate Sequence 0:
+      position:
+        x: 336
+        "y": 96
+      tempMetlId: 5724
+    Fixed Flow 0:
+      position:
+        x: 32
+        "y": 160
+      tempMetlId: 5764
+    Aggregate 0:
+      position:
+        x: 176
+        "y": 64
+      tempMetlId: 5835
+    Aggregate_groupby:
+      position:
+        x: 176
+        "y": 128
+      tempMetlId: 6027
+    Aggregate_groupby_rollup:
+      position:
+        x: 160
+        "y": 224
+      tempMetlId: 6064
+    Calculator 0:
+      position:
+        x: 480
+        "y": -16
+      tempMetlId: 6210
+    Cal_string:
+      position:
+        x: 480
+        "y": 128
+      tempMetlId: 6265
+    Convert Type 0:
+      position:
+        x: 496
+        "y": 214
+      tempMetlId: 6658
+    Distinct 0:
+      position:
+        x: 304
+        "y": 192
+      tempMetlId: 6675
+    Rename 0:
+      position:
+        x: 637
+        "y": 35
+      tempMetlId: 6698
+    SQL 0:
+      position:
+        x: 653
+        "y": 170
+      tempMetlId: 6717
+    Split Field 0:
+      position:
+        x: 720
+        "y": 96
+      tempMetlId: 6772

@@ -1,0 +1,124 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    'Start ':
+      type: "start"
+      transitions:
+        unconditional:
+        - "SQL Script 0"
+      skipped: false
+      parameters:
+        componentName: "Start "
+    S3 Load 0:
+      type: "s3-load"
+      transitions:
+        success:
+        - "Truncate Table 0"
+      skipped: false
+      parameters:
+        componentName: "S3 Load 0"
+        stage: "Stage_AWS"
+        pattern: ".*"
+        encryption: "None"
+        warehouse: "COMPUTE_WH"
+        database: "DEMO_DB"
+        schema: "STUDENTDATA"
+        targetTable: "STUDENTRECORDS"
+        loadColumns:
+        - "RECORDID"
+        - "STUDENTNAME"
+        - "SUBJECT"
+        - "MARKS"
+        - "YEAR"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter: ""
+        fieldDelimiter: ","
+        skipHeader: "1"
+        skipBlankLines: "False"
+        dateFormat: ""
+        timeFormat: ""
+        timestampFormat: ""
+        escape: ""
+        escapeUnenclosedField: ""
+        trimSpace: "False"
+        fieldOptionallyEnclosed: ""
+        nullIf:
+        errorOnColumnCountMismatch: "False"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType: ""
+        onError: "Abort Statement"
+        sizeLimitB: ""
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "True"
+        metadataFields:
+    SQL Script 0:
+      type: "sql-script"
+      transitions:
+        unconditional:
+        - "S3 Load 0"
+      skipped: false
+      parameters:
+        componentName: "SQL Script 0"
+        sqlScript: |-
+          CREATE  OR REPLACE TABLE StudentRecords (
+              RecordID INT PRIMARY KEY ,  -- Unique identifier for each record
+              StudentName VARCHAR(100) NOT NULL,       -- Name of the student
+              Subject VARCHAR(100) NOT NULL,           -- Subject of the exam
+              Marks INT NOT NULL,                      -- Marks obtained by the student
+              Year INT NOT NULL                        -- Year in which the marks were obtained
+          );
+    Truncate Table 0:
+      type: "truncate-table"
+      transitions:
+        success:
+        - "Delete Tables 0"
+      skipped: false
+      parameters:
+        componentName: "Truncate Table 0"
+        warehouse: "COMPUTE_WH"
+        database: "DEMO_DB"
+        schema: "STUDENTDATA"
+        targetTable:
+        - "STUDENTRECORDS"
+    Delete Tables 0:
+      type: "delete-tables"
+      skipped: false
+      parameters:
+        componentName: "Delete Tables 0"
+        database: "DEMO_DB"
+        schema: "STUDENTDATA"
+        targetTable:
+        - "STUDENTRECORDS"
+        ignoreMissing: "Yes"
+design:
+  components:
+    'Start ':
+      position:
+        x: -432
+        "y": -16
+      tempMetlId: 1806
+    S3 Load 0:
+      position:
+        x: -224
+        "y": -16
+      tempMetlId: 1807
+    SQL Script 0:
+      position:
+        x: -331
+        "y": -18
+      tempMetlId: 1949
+    Truncate Table 0:
+      position:
+        x: -109
+        "y": -15
+      tempMetlId: 2054
+    Delete Tables 0:
+      position:
+        x: 5
+        "y": -21
+      tempMetlId: 2101
