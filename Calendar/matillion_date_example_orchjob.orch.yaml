@@ -1,0 +1,239 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start 0:
+      type: "start"
+      transitions:
+        unconditional:
+        - "uk_public_holidays"
+        - "Create Table calendar_dim"
+      skipped: false
+      parameters:
+        componentName: "Start 0"
+    Create Table calendar_dim:
+      type: "create-table-v2"
+      skipped: false
+      parameters:
+        componentName: "Create Table calendar_dim"
+        createMethod: "Replace"
+        database: "DEMO_DATABASE"
+        schema: "DEMO_SCHEMA"
+        table: "calendar_dim"
+        snowflakeTableType: "Permanent"
+        columns:
+        - - "Date_Key"
+          - "NUMBER"
+          - "10"
+          - ""
+          - ""
+          - "No"
+          - "Yes"
+          - ""
+          - ""
+        - - "Date_Value"
+          - "DATE"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Month_Number"
+          - "NUMBER"
+          - "10"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Month_Name"
+          - "VARCHAR"
+          - "256"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Year_Number"
+          - "NUMBER"
+          - "10"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "DayofWeek_Number"
+          - "NUMBER"
+          - "10"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "DayofWeek_Name"
+          - "VARCHAR"
+          - "256"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Quarter_Number"
+          - "VARCHAR"
+          - "256"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Weekend"
+          - "BOOLEAN"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Public_Holiday"
+          - "BOOLEAN"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Public_Holiday_Name"
+          - "VARCHAR"
+          - "256"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Working_Day"
+          - "BOOLEAN"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        defaultDdlCollation: ""
+        primaryKeys:
+        clusteringKeys:
+        dataRetentionTimeInDays: ""
+        comment: ""
+    uk_public_holidays:
+      type: "create-table-v2"
+      transitions:
+        success:
+        - "S3 Load"
+      skipped: false
+      parameters:
+        componentName: "uk_public_holidays"
+        createMethod: "Replace"
+        database: "DEMO_DATABASE"
+        schema: "DEMO_SCHEMA"
+        table: "uk_public_holidays"
+        snowflakeTableType: "Permanent"
+        columns:
+        - - "Holiday_Name"
+          - "VARCHAR"
+          - "256"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Date_Value"
+          - "VARCHAR"
+          - "256"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        defaultDdlCollation: ""
+        primaryKeys:
+        clusteringKeys:
+        dataRetentionTimeInDays: ""
+        comment: ""
+    S3 Load:
+      type: "s3-load"
+      skipped: false
+      parameters:
+        componentName: "S3 Load"
+        stage: "[Custom]"
+        authentication: "Credentials"
+        s3ObjectPrefix: "s3://aj-calender/"
+        pattern: ".*"
+        encryption: "S3 Encryption"
+        warehouse: "DEMO_WAREHOUSE"
+        database: "DEMO_DATABASE"
+        schema: "DEMO_SCHEMA"
+        targetTable: "uk_public_holidays"
+        loadColumns:
+        - "Holiday_Name"
+        - "Date_Value"
+        format: "DEMO_CSV_FILE_FORMAT"
+        onError: "Abort Statement"
+        sizeLimitB: ""
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "False"
+  variables:
+    s3_location:
+      metadata:
+        type: "TEXT"
+        description: ""
+        scope: "COPIED"
+        visibility: "PUBLIC"
+      defaultValue: "aj-calender"
+design:
+  components:
+    Start 0:
+      position:
+        x: -672
+        "y": -16
+      tempMetlId: 12261
+    Create Table calendar_dim:
+      position:
+        x: -544
+        "y": 48
+      tempMetlId: 12262
+    uk_public_holidays:
+      position:
+        x: -544
+        "y": -112
+      tempMetlId: 12263
+    S3 Load:
+      position:
+        x: -400
+        "y": -112
+      tempMetlId: 12264
+  notes:
+    "12260":
+      position:
+        x: -614
+        "y": -223
+      size:
+        height: 58
+        width: 250
+      theme: "red"
+      content: |-
+        **You must provide a value for the s3 location variable
+        Right Click-->Manage Job Variables

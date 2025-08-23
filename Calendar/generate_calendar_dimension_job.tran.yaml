@@ -1,0 +1,299 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    Generate Dates:
+      type: "calculator"
+      sources:
+      - "Generate Sequence"
+      parameters:
+        componentName: "Generate Dates"
+        includeInputColumns: "No"
+        calculations:
+        - - "(DATE '1999-12-31')  + \"sequence\""
+          - "Date_Value"
+    Generate Sequence:
+      type: "generate-sequence"
+      parameters:
+        componentName: "Generate Sequence"
+        startValue: "1"
+        incrementValue: "1"
+        endValue: "10000"
+        outputColumn: "sequence"
+    Generate Date Cols:
+      type: "calculator"
+      sources:
+      - "Generate Dates"
+      parameters:
+        componentName: "Generate Date Cols"
+        includeInputColumns: "Yes"
+        calculations:
+        - - "CAST(TO_CHAR (\"Date_Value\", 'YYYYMMDD') AS Number)"
+          - "Date_Key"
+        - - "DATE_PART ( year, \"Date_Value\")"
+          - "Year_Number"
+        - - "DATE_PART ( month, \"Date_Value\")"
+          - "Month_Number"
+        - - "MONTHNAME(\"Date_Value\")"
+          - "Month_Name"
+        - - "DATE_PART ( weekday, \"Date_Value\" )"
+          - "DayOfWeek_Number"
+        - - "DAYNAME(\"Date_Value\")"
+          - "DayOfWeek_Name"
+        - - "'q' || DATE_PART ( quarter, \"Date_Value\")"
+          - "Quarter_Number"
+    Weekend:
+      type: "calculator"
+      sources:
+      - "Generate Date Cols"
+      parameters:
+        componentName: "Weekend"
+        includeInputColumns: "Yes"
+        calculations:
+        - - "CASE \nWHEN \"DayOfWeek_Number\" IN (0,6) THEN 1\nELSE 0\nEND\n"
+          - "Weekend"
+    uk_public_holidays:
+      type: "table-input"
+      parameters:
+        componentName: "uk_public_holidays"
+        database: "DEMO_DATABASE"
+        schema: "DEMO_SCHEMA"
+        targetTable: "uk_public_holidays"
+        columnNames:
+        - "Holiday_Name"
+        - "Date_Value"
+        timeOffset: ""
+    Join:
+      type: "join"
+      sources:
+      - "convert date to YYYY-MM-DD"
+      - "Weekend"
+      parameters:
+        componentName: "Join"
+        mainTable: "Weekend"
+        mainTableAlias: "wknd"
+        joins:
+        - - "convert date to YYYY-MM-DD"
+          - "ukph"
+          - "Left"
+        joinExpressions:
+        - - "\"wknd\".\"Date_Value\" = \"ukph\".\"uk_formatted_date\""
+          - "wknd_Left_ukph"
+        columnMappings:
+        - - "wknd.Date_Key"
+          - "Date_Key"
+        - - "wknd.Date_Value"
+          - "Date_Value"
+        - - "wknd.Month_Number"
+          - "Month_Number"
+        - - "wknd.Month_Name"
+          - "Month_Name"
+        - - "wknd.Year_Number"
+          - "Year_Number"
+        - - "wknd.DayOfWeek_Number"
+          - "DayOfWeek_Number"
+        - - "wknd.DayOfWeek_Name"
+          - "DayOfWeek_Name"
+        - - "wknd.Quarter_Number"
+          - "Quarter_Number"
+        - - "wknd.Weekend"
+          - "Weekend"
+        - - "ukph.Holiday_Name"
+          - "Holiday_Name"
+        - - "ukph.uk_formatted_date"
+          - "Holiday_Date"
+    Holidays/Working Days:
+      type: "calculator"
+      sources:
+      - "Join"
+      parameters:
+        componentName: "Holidays/Working Days"
+        includeInputColumns: "Yes"
+        calculations:
+        - - "CASE \nWHEN \"Date_Value\"=\"Holiday_Date\" THEN 1\nELSE 0\nEND"
+          - "Public_Holiday"
+        - - "CASE \nWHEN \"Date_Value\"=\"Holiday_Date\" THEN 0\nWHEN   \"Weekend\"\
+            \ = 1 THEN 0\nELSE 1\nEND"
+          - "Working_Day"
+        - - "ROW_NUMBER() OVER (PARTITION BY \"Date_Key\" ORDER BY \"Date_Key\" ASC) "
+          - "Deduplicator"
+    Calendar_Dim:
+      type: "table-output"
+      sources:
+      - "Filter 0"
+      parameters:
+        componentName: "Calendar_Dim"
+        warehouse: "DEMO_WAREHOUSE"
+        database: "DEMO_DATABASE"
+        schema: "DEMO_SCHEMA"
+        targetTable: "calendar_dim"
+        fixDataTypeMismatches: "No"
+        columnMapping:
+        - - "Date_Key"
+          - "Date_Key"
+        - - "Date_Value"
+          - "Date_Value"
+        - - "Month_Number"
+          - "Month_Number"
+        - - "Month_Name"
+          - "Month_Name"
+        - - "Year_Number"
+          - "Year_Number"
+        - - "DayOfWeek_Number"
+          - "DayofWeek_Number"
+        - - "DayOfWeek_Name"
+          - "DayofWeek_Name"
+        - - "Quarter_Number"
+          - "Quarter_Number"
+        - - "Weekend"
+          - "Weekend"
+        - - "Public_Holiday"
+          - "Public_Holiday"
+        - - "Holiday_Name"
+          - "Public_Holiday_Name"
+        - - "Working_Day"
+          - "Working_Day"
+        orderBy:
+        outputMode: "Truncate"
+    Filter 0:
+      type: "filter"
+      sources:
+      - "Holidays/Working Days"
+      parameters:
+        componentName: "Filter 0"
+        filterConditions:
+        - - "Deduplicator"
+          - "Is"
+          - "Equal to"
+          - "1"
+        combineCondition: "AND"
+    convert date to YYYY-MM-DD:
+      type: "calculator"
+      sources:
+      - "uk_public_holidays"
+      parameters:
+        componentName: "convert date to YYYY-MM-DD"
+        includeInputColumns: "Yes"
+        calculations:
+        - - |
+            TO_CHAR(TO_DATE("Date_Value", 'DD/MM/YYYY'), 'YYYY-MM-DD')
+          - "uk_formatted_date"
+design:
+  components:
+    Generate Dates:
+      position:
+        x: 304
+        "y": 208
+      tempMetlId: 12276
+    Generate Sequence:
+      position:
+        x: 112
+        "y": 208
+      tempMetlId: 12277
+    Generate Date Cols:
+      position:
+        x: 432
+        "y": 208
+      tempMetlId: 12278
+    Weekend:
+      position:
+        x: 560
+        "y": 208
+      tempMetlId: 12279
+    uk_public_holidays:
+      position:
+        x: 672
+        "y": 496
+      tempMetlId: 12280
+    Join:
+      position:
+        x: 672
+        "y": 208
+      tempMetlId: 12281
+    Holidays/Working Days:
+      position:
+        x: 816
+        "y": 208
+      tempMetlId: 12282
+    Calendar_Dim:
+      position:
+        x: 1120
+        "y": 208
+      tempMetlId: 12283
+    Filter 0:
+      position:
+        x: 966
+        "y": 203
+      tempMetlId: 12284
+    convert date to YYYY-MM-DD:
+      position:
+        x: 672
+        "y": 400
+      tempMetlId: 13287
+  notes:
+    "12271":
+      position:
+        x: 377
+        "y": 113
+      size:
+        height: 165
+        width: 118
+      theme: "yellow"
+      content: "Create columns for date key, month, year, day of week, quarter using\
+        \ the date_value column"
+    "12270":
+      position:
+        x: 516
+        "y": 115
+      size:
+        height: 160
+        width: 96
+      theme: "yellow"
+      content: "Check date to see if it's a weekend"
+    "12273":
+      position:
+        x: 750
+        "y": 110
+      size:
+        height: 164
+        width: 139
+      theme: "yellow"
+      content: "Check if the dates fall on a public holiday and if it's a working\
+        \ day. Assign a sequential integer to each row within the partition of date_key"
+    "12272":
+      position:
+        x: 630
+        "y": 109
+      size:
+        height: 165
+        width: 98
+      theme: "yellow"
+      content: "Join together the two data sources (calendar columns with the IN public\
+        \ holidays)"
+    "12275":
+      position:
+        x: 911
+        "y": 116
+      size:
+        height: 153
+        width: 98
+      theme: "yellow"
+      content: "Filter out row count greater than 1 - removes duplicates"
+    "12274":
+      position:
+        x: 1044
+        "y": 149
+      size:
+        height: 116
+        width: 261
+      theme: "yellow"
+      content: "Output generated calendar columns into the calendar dimension table"
+    "12269":
+      position:
+        x: 238
+        "y": 115
+      size:
+        height: 158
+        width: 118
+      theme: "yellow"
+      content: "Generate date based on the sequence (From 2000-01-01+)"
