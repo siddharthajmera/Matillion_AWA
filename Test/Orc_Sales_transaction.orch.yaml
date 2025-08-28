@@ -1,0 +1,171 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start:
+      type: "start"
+      transitions:
+        unconditional:
+        - "Create Table"
+      parameters:
+        componentName: "Start"
+    Create Table:
+      type: "create-table-v2"
+      transitions:
+        success:
+        - "S3 Load"
+      parameters:
+        componentName: "Create Table"
+        createMethod: "Create If Not Exists"
+        database: "DEMODATABASE"
+        schema: "DEMOSCHEMA"
+        table: "Sales_transaction"
+        snowflakeTableType: "Permanent"
+        columns:
+        - - "TransactionID"
+          - "NUMBER"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "CustomerName"
+          - "VARCHAR"
+          - "100"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Product"
+          - "VARCHAR"
+          - "100"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Category"
+          - "VARCHAR"
+          - "50"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Quantity"
+          - "NUMBER"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "Price "
+          - "NUMBER"
+          - "10"
+          - "2"
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "State"
+          - "VARCHAR"
+          - "20"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "TransactionDate"
+          - "DATE"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        defaultDdlCollation:
+        primaryKeys:
+        - "TransactionID"
+        clusteringKeys:
+        dataRetentionTimeInDays:
+        comment:
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+    S3 Load:
+      type: "s3-load"
+      parameters:
+        componentName: "S3 Load"
+        stage: "[Custom]"
+        authentication: "Credentials"
+        s3ObjectPrefix: "s3://sidanalytics/customer/sales_transactions_1000.csv"
+        pattern: ".*"
+        encryption: "S3 Encryption"
+        warehouse: "COMPUTE_WH"
+        database: "DEMODATABASE"
+        schema: "DEMOSCHEMA"
+        targetTable: "Sales_transaction"
+        loadColumns:
+        - "TransactionID"
+        - "CustomerName"
+        - "Product"
+        - "Category"
+        - "Quantity"
+        - "Price "
+        - "State"
+        - "TransactionDate"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter:
+        fieldDelimiter: ","
+        skipHeader: "1"
+        skipBlankLines: "True"
+        dateFormat:
+        timeFormat:
+        timestampFormat:
+        escape:
+        escapeUnenclosedField:
+        trimSpace: "False"
+        fieldOptionallyEnclosed:
+        nullIf:
+        errorOnColumnCountMismatch: "True"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType:
+        onError: "Abort Statement"
+        sizeLimitB:
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "False"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+design:
+  components:
+    Start:
+      position:
+        x: -230
+        "y": 30
+      tempMetlId: 1
+    Create Table:
+      position:
+        x: -70
+        "y": 30
+      tempMetlId: 2
+    S3 Load:
+      position:
+        x: 90
+        "y": 30
+      tempMetlId: 3
