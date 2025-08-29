@@ -7,6 +7,7 @@ pipeline:
       transitions:
         unconditional:
         - "Create Table"
+        - "SQL Script"
       parameters:
         componentName: "Start"
     Create Table:
@@ -16,7 +17,7 @@ pipeline:
         - "S3 Load"
       parameters:
         componentName: "Create Table"
-        createMethod: "Create If Not Exists"
+        createMethod: "Replace"
         database: "DEMODATABASE"
         schema: "DEMOSCHEMA"
         table: "Sales_transaction"
@@ -152,6 +153,18 @@ pipeline:
       postProcessing:
         updateOutputMessage:
         updateScalarVariables:
+    SQL Script:
+      type: "sql-executor"
+      parameters:
+        componentName: "SQL Script"
+        scriptLocation: "Component"
+        declareSqlVariables: "Include selected"
+        variablesToInclude: []
+        sqlScript: "DELETE FROM DEMODATABASE.DEMOSCHEMA.\"Sales_transaction\" WHERE\
+          \ CustomerName = \"Evan Soto\""
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
 design:
   components:
     Start:
@@ -169,3 +182,8 @@ design:
         x: 90
         "y": 30
       tempMetlId: 3
+    SQL Script:
+      position:
+        x: -70
+        "y": -90
+      tempMetlId: 4
