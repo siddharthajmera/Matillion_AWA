@@ -169,6 +169,20 @@ pipeline:
           - "1"
           - "PREV_DAY_BALANCE"
         ignoreNulls: "Yes"
+    Rename:
+      type: "rename"
+      sources:
+      - "Aggregate ACCOUNT_ID"
+      parameters:
+        componentName: "Rename"
+        columnMapping:
+        - - "ACCOUNT_ID"
+          - "ACCOUNT_ID"
+        - - "count_distinct_TRANS_ID"
+          - "Total Count"
+        - - "sum_BALANCE"
+          - "Total Transaction Amount"
+        includeInputColumns: "No"
 design:
   components:
     BANK TXNS INPUT TABLE:
@@ -226,3 +240,8 @@ design:
         x: -1152
         "y": 16
       tempMetlId: 9204
+    Rename:
+      position:
+        x: -960
+        "y": -480
+      tempMetlId: 9205
