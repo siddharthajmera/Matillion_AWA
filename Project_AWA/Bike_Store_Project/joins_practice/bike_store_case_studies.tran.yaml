@@ -1,0 +1,739 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    production_categories:
+      type: "table-input"
+      parameters:
+        componentName: "production_categories"
+        database: "BIKESTORES"
+        schema: "PRODUCTION"
+        targetTable: "CATEGORIES"
+        columnNames:
+        - "CATEGORY_ID"
+        - "CATEGORY_NAME"
+        timeOffset: ""
+    production_products:
+      type: "table-input"
+      parameters:
+        componentName: "production_products"
+        database: "BIKESTORES"
+        schema: "PRODUCTION"
+        targetTable: "PRODUCTS"
+        columnNames:
+        - "PRODUCT_ID"
+        - "PRODUCT_NAME"
+        - "BRAND_ID"
+        - "CATEGORY_ID"
+        - "MODEL_YEAR"
+        - "LIST_PRICE"
+        timeOffset: ""
+    production_brands:
+      type: "table-input"
+      parameters:
+        componentName: "production_brands"
+        database: "BIKESTORES"
+        schema: "PRODUCTION"
+        targetTable: "BRANDS"
+        columnNames:
+        - "BRAND_ID"
+        - "BRAND_NAME"
+        timeOffset: ""
+    Joining Facts & Dim Tables:
+      type: "join"
+      sources:
+      - "sales_stores"
+      - "sales_staffs"
+      - "sales_orders"
+      - "production_categories"
+      - "sales_order_items"
+      - "production_brands"
+      - "production_stocks"
+      - "sales_customers"
+      - "production_products"
+      parameters:
+        componentName: "Joining Facts & Dim Tables"
+        mainTable: "production_categories"
+        mainTableAlias: "cat"
+        joins:
+        - - "production_products"
+          - "prod"
+          - "Left"
+        - - "production_brands"
+          - "br"
+          - "Left"
+        - - "sales_order_items"
+          - "oi"
+          - "Left"
+        - - "sales_orders"
+          - "ord"
+          - "Left"
+        - - "sales_customers"
+          - "cust"
+          - "Left"
+        - - "sales_stores"
+          - "store"
+          - "Left"
+        - - "sales_staffs"
+          - "staff"
+          - "Left"
+        - - "production_stocks"
+          - "stock"
+          - "Left"
+        joinExpressions:
+        - - "\"cat\".\"CATEGORY_ID\" = \"prod\".\"CATEGORY_ID\""
+          - "cat_Left_prod"
+        - - "\"prod\".\"BRAND_ID\" = \"br\".\"BRAND_ID\""
+          - "cat_Left_br"
+        - - "\"prod\".\"PRODUCT_ID\" = \"oi\".\"PRODUCT_ID\""
+          - "cat_Left_oi"
+        - - "\"oi\".\"ORDER_ID\" = \"ord\".\"ORDER_ID\""
+          - "cat_Left_ord"
+        - - "\"ord\".\"CUSTOMER_ID\" = \"cust\".\"CUSTOMER_ID\""
+          - "cat_Left_cust"
+        - - "\"ord\".\"STORE_ID\" = \"store\".\"STORE_ID\""
+          - "cat_Left_store"
+        - - "\"ord\".\"STAFF_ID\" = \"staff\".\"STAFF_ID\""
+          - "cat_Left_staff"
+        - - "\"prod\".\"PRODUCT_ID\" = \"stock\".\"PRODUCT_ID\" AND \"store\".\"STORE_ID\"\
+            \ = \"stock\".\"STORE_ID\""
+          - "cat_Left_stock"
+        columnMappings:
+        - - "cat.CATEGORY_ID"
+          - "CATEGORY_ID"
+        - - "cat.CATEGORY_NAME"
+          - "CATEGORY_NAME"
+        - - "br.BRAND_ID"
+          - "BRAND_ID"
+        - - "br.BRAND_NAME"
+          - "BRAND_NAME"
+        - - "prod.PRODUCT_ID"
+          - "PRODUCT_ID"
+        - - "prod.PRODUCT_NAME"
+          - "PRODUCT_NAME"
+        - - "prod.MODEL_YEAR"
+          - "MODEL_YEAR"
+        - - "prod.LIST_PRICE"
+          - "PRODUCT_LIST_PRICE"
+        - - "cust.CUSTOMER_ID"
+          - "CUSTOMER_ID"
+        - - "cust.FIRST_NAME"
+          - "CUST_FIRST_NAME"
+        - - "cust.LAST_NAME"
+          - "CUST_LAST_NAME"
+        - - "cust.PHONE"
+          - "CUST_PHONE"
+        - - "cust.EMAIL"
+          - "CUST_EMAIL"
+        - - "cust.STREET"
+          - "CUST_STREET"
+        - - "cust.STATE"
+          - "CUST_STATE"
+        - - "cust.CITY"
+          - "CUST_CITY"
+        - - "cust.ZIP_CODE"
+          - "CUST_ZIP_CODE"
+        - - "store.STORE_ID"
+          - "STORE_ID"
+        - - "store.STORE_NAME"
+          - "STORE_NAME"
+        - - "store.PHONE"
+          - "STORE_PHONE"
+        - - "store.EMAIL"
+          - "STORE_EMAIL"
+        - - "store.STREET"
+          - "STORE_STREET"
+        - - "store.CITY"
+          - "STORE_CITY"
+        - - "store.STATE"
+          - "STORE_STATE"
+        - - "store.ZIP_CODE"
+          - "STORE_ZIP_CODE"
+        - - "staff.STAFF_ID"
+          - "STAFF_ID"
+        - - "staff.FIRST_NAME"
+          - "STAFF_FIRST_NAME"
+        - - "staff.LAST_NAME"
+          - "STAFF_LAST_NAME"
+        - - "staff.EMAIL"
+          - "STAFF_EMAIL"
+        - - "staff.PHONE"
+          - "staff_PHONE"
+        - - "staff.ACTIVE"
+          - "STAFF_ACTIVE"
+        - - "staff.MANAGER_ID"
+          - "MANAGER_ID"
+        - - "ord.ORDER_ID"
+          - "ORDER_ID"
+        - - "ord.ORDER_STATUS"
+          - "ORDER_STATUS"
+        - - "ord.ORDER_DATE"
+          - "ORDER_DATE"
+        - - "ord.REQUIRED_DATE"
+          - "REQUIRED_DATE"
+        - - "ord.SHIPPED_DATE"
+          - "SHIPPED_DATE"
+        - - "oi.ITEM_ID"
+          - "ITEM_ID"
+        - - "oi.QUANTITY"
+          - "ORDER_ITEM_QUANTITY"
+        - - "oi.LIST_PRICE"
+          - "ORDER_ITEM_LIST_PRICE"
+        - - "oi.DISCOUNT"
+          - "ORDER_ITEM_DISCOUNT"
+        - - "stock.QUANTITY"
+          - "STOCK_QUANTITY"
+    sales_order_items:
+      type: "table-input"
+      parameters:
+        componentName: "sales_order_items"
+        database: "BIKESTORES"
+        schema: "SALES"
+        targetTable: "ORDER_ITEMS"
+        columnNames:
+        - "ORDER_ID"
+        - "ITEM_ID"
+        - "PRODUCT_ID"
+        - "QUANTITY"
+        - "LIST_PRICE"
+        - "DISCOUNT"
+        timeOffset: ""
+    sales_orders:
+      type: "table-input"
+      parameters:
+        componentName: "sales_orders"
+        database: "BIKESTORES"
+        schema: "SALES"
+        targetTable: "ORDERS"
+        columnNames:
+        - "ORDER_ID"
+        - "CUSTOMER_ID"
+        - "ORDER_STATUS"
+        - "ORDER_DATE"
+        - "REQUIRED_DATE"
+        - "SHIPPED_DATE"
+        - "STORE_ID"
+        - "STAFF_ID"
+        timeOffset: ""
+    sales_customers:
+      type: "table-input"
+      parameters:
+        componentName: "sales_customers"
+        database: "BIKESTORES"
+        schema: "SALES"
+        targetTable: "CUSTOMERS"
+        columnNames:
+        - "CUSTOMER_ID"
+        - "FIRST_NAME"
+        - "LAST_NAME"
+        - "PHONE"
+        - "EMAIL"
+        - "STREET"
+        - "CITY"
+        - "STATE"
+        - "ZIP_CODE"
+        timeOffset: ""
+    sales_stores:
+      type: "table-input"
+      parameters:
+        componentName: "sales_stores"
+        database: "BIKESTORES"
+        schema: "SALES"
+        targetTable: "STORES"
+        columnNames:
+        - "STORE_ID"
+        - "STORE_NAME"
+        - "PHONE"
+        - "EMAIL"
+        - "STREET"
+        - "CITY"
+        - "STATE"
+        - "ZIP_CODE"
+        timeOffset: ""
+    sales_staffs:
+      type: "table-input"
+      parameters:
+        componentName: "sales_staffs"
+        database: "BIKESTORES"
+        schema: "SALES"
+        targetTable: "STAFFS"
+        columnNames:
+        - "STAFF_ID"
+        - "STORE_ID"
+        - "PHONE"
+        - "EMAIL"
+        - "FIRST_NAME"
+        - "LAST_NAME"
+        - "ACTIVE"
+        - "MANAGER_ID"
+        timeOffset: ""
+    production_stocks:
+      type: "table-input"
+      parameters:
+        componentName: "production_stocks"
+        database: "BIKESTORES"
+        schema: "PRODUCTION"
+        targetTable: "STOCKS"
+        columnNames:
+        - "PRODUCT_ID"
+        - "STORE_ID"
+        - "QUANTITY"
+        timeOffset: ""
+    Extracting Metrics:
+      type: "calculator"
+      sources:
+      - "Joining Facts & Dim Tables"
+      parameters:
+        componentName: "Extracting Metrics"
+        includeInputColumns: "Yes"
+        calculations:
+        - - "YEAR(\"ORDER_DATE\")"
+          - "ORDER_YR"
+        - - "MONTH(\"ORDER_DATE\")"
+          - "ORDER_MNTH"
+        - - "ROUND(\"ORDER_ITEM_QUANTITY\" * \"ORDER_ITEM_LIST_PRICE\" * (1 - \"ORDER_ITEM_DISCOUNT\"\
+            ),0)"
+          - "ORDER_ITEM_SALES"
+        - - "CONCAT(\"STAFF_FIRST_NAME\", ' ', \"STAFF_LAST_NAME\")"
+          - "STAFF_NAME"
+        - - "CONCAT(\"CUST_FIRST_NAME\", ' ', \"CUST_LAST_NAME\")"
+          - "CUST_NAME"
+    Lead/Lag:
+      type: "lead-lag"
+      sources:
+      - "monthly_sales"
+      parameters:
+        componentName: "Lead/Lag"
+        includeInputColumns: "Yes"
+        partitionData:
+        - "STORE_ID"
+        orderingsWithinPartitions:
+        - - "ORDER_YR"
+          - "Asc"
+        - - "ORDER_MNTH"
+          - "Asc"
+        functions:
+        - - "Lag"
+          - "sum_ORDER_ITEM_SALES"
+          - "1"
+          - "previous_month_sales"
+        ignoreNulls: "No"
+    monthly_sales:
+      type: "aggregate"
+      sources:
+      - "Extracting Metrics"
+      parameters:
+        componentName: "monthly_sales"
+        groupings:
+        - "STORE_ID"
+        - "STORE_NAME"
+        - "ORDER_YR"
+        - "ORDER_MNTH"
+        aggregations:
+        - - "ORDER_ITEM_SALES"
+          - "Sum"
+        groupingType: "Group By"
+    Calculating Monthly Growth:
+      type: "calculator"
+      sources:
+      - "Lead/Lag"
+      parameters:
+        componentName: "Calculating Monthly Growth"
+        includeInputColumns: "Yes"
+        calculations:
+        - - "NVL(\"sum_ORDER_ITEM_SALES\",0)"
+          - "sum_ORDER_ITEM_SALES"
+        - - "NVL(\"previous_month_sales\",0)"
+          - "previous_month_sales"
+        - - "ROUND(NVL(((NVL(\"sum_ORDER_ITEM_SALES\",0) - NVL(\"previous_month_sales\"\
+            ,0)) / NULLIF(\"previous_month_sales\",0) * 100),0),2)"
+          - "month_over_month_growth"
+    Map Values Monthly Growth:
+      type: "map-values"
+      sources:
+      - "Calculating Monthly Growth"
+      parameters:
+        componentName: "Map Values Monthly Growth"
+        valueMap:
+        - - "month_over_month_growth"
+          - "Is"
+          - "Greater than"
+          - "0"
+          - "Positive Growth"
+        - - "month_over_month_growth"
+          - "Is"
+          - "Less than"
+          - "0"
+          - "Negative Growth"
+        columnName: "Growth Segmentation"
+        other: "No Change In Growth"
+    Filter Out Nulls:
+      type: "filter"
+      sources:
+      - "Map Values Monthly Growth"
+      parameters:
+        componentName: "Filter Out Nulls"
+        filterConditions:
+        - - "STORE_ID"
+          - "Not"
+          - "Null"
+          - ""
+        combineCondition: "AND"
+    Rewrite Table Monthly Sales Growth per Store:
+      type: "rewrite-table"
+      sources:
+      - "Rename Columns"
+      parameters:
+        componentName: "Rewrite Table Monthly Sales Growth per Store"
+        warehouse: "DEMO_WAREHOUSE"
+        database: "BIKESTORES"
+        schema: "PUBLIC"
+        targetTable: "Monthly_Sales_Growth_per_Store"
+        orderBy:
+    Rename Columns:
+      type: "rename"
+      sources:
+      - "Filter Out Nulls"
+      parameters:
+        componentName: "Rename Columns"
+        columnMapping:
+        - - "STORE_ID"
+          - "STORE_ID"
+        - - "STORE_NAME"
+          - "STORE_NAME"
+        - - "ORDER_YR"
+          - "ORDER_YR"
+        - - "ORDER_MNTH"
+          - "ORDER_MNTH"
+        - - "sum_ORDER_ITEM_SALES"
+          - "CURR_MNTH_SALES"
+        - - "previous_month_sales"
+          - "PREV_MNTH_SALES"
+        - - "month_over_month_growth"
+          - "MNTH_OVER_MNTH_GRWTH"
+        - - "Growth Segmentation"
+          - "GROWTH SEGMENT"
+        includeInputColumns: "No"
+    cust_orders_details:
+      type: "aggregate"
+      sources:
+      - "Extracting Metrics"
+      parameters:
+        componentName: "cust_orders_details"
+        groupings:
+        - "CUSTOMER_ID"
+        - "CUST_NAME"
+        aggregations:
+        - - "ORDER_DATE"
+          - "Min"
+        - - "ORDER_DATE"
+          - "Max"
+        - - "ORDER_ID"
+          - "Count"
+        - - "ORDER_ITEM_SALES"
+          - "Sum"
+        groupingType: "Group By"
+    Order Gap:
+      type: "calculator"
+      sources:
+      - "cust_orders_details"
+      parameters:
+        componentName: "Order Gap"
+        includeInputColumns: "No"
+        calculations:
+        - - "\"CUSTOMER_ID\""
+          - "CUSTOMER_ID"
+        - - "\"CUST_NAME\""
+          - "CUST_NAME"
+        - - "\"min_ORDER_DATE\""
+          - "FIRST_ORDER_DATE"
+        - - "\"max_ORDER_DATE\""
+          - "LAST_ORDER_DATE"
+        - - "DATEDIFF('day', \"min_ORDER_DATE\", \"max_ORDER_DATE\")"
+          - "LATEST_EARLIEST_ORDER_GAP"
+        - - "DATEDIFF('day', \"max_ORDER_DATE\", CURRENT_DATE)"
+          - "RECENCY"
+        - - "\"count_ORDER_ID\""
+          - "ORDER_FREQUENCY"
+        - - "\"sum_ORDER_ITEM_SALES\""
+          - "TOTAL_SPENT"
+    Calculating Percent Rank:
+      type: "calculator"
+      sources:
+      - "Order Gap"
+      parameters:
+        componentName: "Calculating Percent Rank"
+        includeInputColumns: "Yes"
+        calculations:
+        - - "ROUND(PERCENT_RANK() OVER (ORDER BY \"RECENCY\" ASC) * 100,2)"
+          - "RECENCY_PERCENTILE"
+        - - "ROUND(PERCENT_RANK() OVER (ORDER BY \"ORDER_FREQUENCY\" ASC) * 100,2)"
+          - "FREQUENCY_PERCENTILE"
+        - - "ROUND(PERCENT_RANK() OVER (ORDER BY \"TOTAL_SPENT\" ASC) * 100,2)"
+          - "MONETARY_PERCENTILE"
+    Map Recency Rank:
+      type: "map-values"
+      sources:
+      - "Calculating Percent Rank"
+      parameters:
+        componentName: "Map Recency Rank"
+        valueMap:
+        - - "RECENCY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.75"
+          - "4"
+        - - "RECENCY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.5"
+          - "3"
+        - - "FREQUENCY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.25"
+          - "2"
+        columnName: "RECENCY_RANK"
+        other: "1"
+    Map Frequency Rank:
+      type: "map-values"
+      sources:
+      - "Map Recency Rank"
+      parameters:
+        componentName: "Map Frequency Rank"
+        valueMap:
+        - - "FREQUENCY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.75"
+          - "4"
+        - - "FREQUENCY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.5"
+          - "3"
+        - - "MONETARY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.25"
+          - "2"
+        columnName: "FREQUENCY_RANK"
+        other: "1"
+    Map Monetary Rank:
+      type: "map-values"
+      sources:
+      - "Map Frequency Rank"
+      parameters:
+        componentName: "Map Monetary Rank"
+        valueMap:
+        - - "MONETARY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.75"
+          - "4"
+        - - "MONETARY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.5"
+          - "3"
+        - - "MONETARY_PERCENTILE"
+          - "Is"
+          - "Greater than or equal to"
+          - "0.25"
+          - "2"
+        columnName: "MONETARY_RANK"
+        other: "1"
+    Calculating RFM Segment:
+      type: "calculator"
+      sources:
+      - "Map Monetary Rank"
+      parameters:
+        componentName: "Calculating RFM Segment"
+        includeInputColumns: "Yes"
+        calculations:
+        - - |-
+            CASE
+                 WHEN "RECENCY_PERCENTILE" >= 0.75 AND "FREQUENCY_PERCENTILE" >= 0.75 AND "MONETARY_PERCENTILE" >= 0.75 THEN 'High Value'
+                 WHEN "RECENCY_PERCENTILE" < 0.25 AND "FREQUENCY_PERCENTILE" < 0.25 AND "MONETARY_PERCENTILE" < 0.25 THEN 'Low Value'
+                 ELSE 'Mid Value'
+            END
+          - "RFM_SEGMENT"
+    Rewrite Table CUST_MONETARY_VALUE_ANALYSIS:
+      type: "rewrite-table"
+      sources:
+      - "Calculating RFM Segment"
+      parameters:
+        componentName: "Rewrite Table CUST_MONETARY_VALUE_ANALYSIS"
+        warehouse: "DEMO_WAREHOUSE"
+        database: "BIKESTORES"
+        schema: "PUBLIC"
+        targetTable: "CUST_MONETARY_VALUE_ANALYSIS"
+        orderBy:
+        - - "CUSTOMER_ID"
+          - "Ascending"
+        - - "CUST_NAME"
+          - "Ascending"
+design:
+  components:
+    production_categories:
+      position:
+        x: 432
+        "y": 32
+      tempMetlId: 78620
+    production_products:
+      position:
+        x: 272
+        "y": 32
+      tempMetlId: 78622
+    production_brands:
+      position:
+        x: 560
+        "y": 32
+      tempMetlId: 78626
+    Joining Facts & Dim Tables:
+      position:
+        x: 736
+        "y": 352
+      tempMetlId: 78780
+    sales_order_items:
+      position:
+        x: 688
+        "y": 32
+      tempMetlId: 78835
+    sales_orders:
+      position:
+        x: 816
+        "y": 32
+      tempMetlId: 78920
+    sales_customers:
+      position:
+        x: 960
+        "y": 32
+      tempMetlId: 78962
+    sales_stores:
+      position:
+        x: 1104
+        "y": 32
+      tempMetlId: 79061
+    sales_staffs:
+      position:
+        x: 1232
+        "y": 32
+      tempMetlId: 79101
+    production_stocks:
+      position:
+        x: 1376
+        "y": 32
+      tempMetlId: 79201
+    Extracting Metrics:
+      position:
+        x: 736
+        "y": 480
+      tempMetlId: 79359
+    Lead/Lag:
+      position:
+        x: 1104
+        "y": 368
+      tempMetlId: 79508
+    monthly_sales:
+      position:
+        x: 944
+        "y": 368
+      tempMetlId: 79542
+    Calculating Monthly Growth:
+      position:
+        x: 1248
+        "y": 368
+      tempMetlId: 79692
+    Map Values Monthly Growth:
+      position:
+        x: 1424
+        "y": 368
+      tempMetlId: 80061
+    Filter Out Nulls:
+      position:
+        x: 1552
+        "y": 368
+      tempMetlId: 80120
+    Rewrite Table Monthly Sales Growth per Store:
+      position:
+        x: 1872
+        "y": 368
+      tempMetlId: 80135
+    Rename Columns:
+      position:
+        x: 1680
+        "y": 368
+      tempMetlId: 80174
+    cust_orders_details:
+      position:
+        x: 944
+        "y": 496
+      tempMetlId: 80369
+    Order Gap:
+      position:
+        x: 1072
+        "y": 496
+      tempMetlId: 80561
+    Calculating Percent Rank:
+      position:
+        x: 1216
+        "y": 496
+      tempMetlId: 80940
+    Map Recency Rank:
+      position:
+        x: 1360
+        "y": 496
+      tempMetlId: 81072
+    Map Frequency Rank:
+      position:
+        x: 1488
+        "y": 496
+      tempMetlId: 81112
+    Map Monetary Rank:
+      position:
+        x: 1632
+        "y": 496
+      tempMetlId: 81157
+    Calculating RFM Segment:
+      position:
+        x: 1771
+        "y": 492
+      tempMetlId: 81264
+    Rewrite Table CUST_MONETARY_VALUE_ANALYSIS:
+      position:
+        x: 1952
+        "y": 496
+      tempMetlId: 81390
+  notes:
+    "80318":
+      position:
+        x: 1216
+        "y": 130
+      size:
+        height: 93
+        width: 561
+      theme: "yellow"
+      content: |-
+        ** 5.Monthly Sales Growth per Store**
+
+        -- Problem: Calculate the month-over-month growth in total sales for each store, allowing the business to analyze performance trends over time.
+
+        -- Solution: Using window functions and CTEs to calculate month-over-month sales growth for each store.
+    "81333":
+      position:
+        x: 180
+        "y": 365
+      size:
+        height: 146
+        width: 467
+      theme: "yellow"
+      content: |-
+        ** 6. Customer Order Recency, Frequency, and Monetary Value Analysis (RFM) **
+
+        -- Problem: Classify customers based on Recency, Frequency, and Monetary (RFM) analysis to help in targeting high-value customers with marketing campaigns.
+
+        -- Recency: Days since the last purchase
+        -- Frequency: Total number of orders placed
+        -- Monetary: Total revenue generated by the customer
+        -- Solution: Using window functions, CTEs, and date calculations to create RFM segments for each customer.
