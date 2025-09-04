@@ -1,0 +1,77 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    ONLINE_ORDER:
+      type: "table-input"
+      parameters:
+        componentName: "ONLINE_ORDER"
+        database: "DEMODATABASE"
+        schema: "DEMOSCHEMA"
+        targetTable: "ONLINE_ORDER"
+        columnNames:
+        - "CUSTOMER_ID"
+        - "CUSTOMER_NAME"
+        - "ORDER_DATE"
+        - "AMOUNT"
+        timeOffset:
+    INSTORE_ORDER:
+      type: "table-input"
+      parameters:
+        componentName: "INSTORE_ORDER"
+        database: "DEMODATABASE"
+        schema: "DEMOSCHEMA"
+        targetTable: "INSTORE_ORDER"
+        columnNames:
+        - "CUSTOMER_ID"
+        - "CUSTOMER_NAME"
+        - "ORDER_DATE"
+        - "AMOUNT"
+        timeOffset:
+    Unite:
+      type: "unite"
+      sources:
+      - "ONLINE_ORDER"
+      - "INSTORE_ORDER"
+      parameters:
+        componentName: "Unite"
+        method: "Overlapping Columns"
+        castTypes: "Yes"
+        addSourceComponentColumn: "No"
+        removeDuplicates: "Yes"
+    Rewrite Table:
+      type: "rewrite-table"
+      sources:
+      - "Unite"
+      parameters:
+        componentName: "Rewrite Table"
+        warehouse: "COMPUTE_WH"
+        database: "DEMODATABASE"
+        schema: "DEMOSCHEMA"
+        targetTable: "AfterRemoveDuplicates"
+        orderBy:
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+design:
+  components:
+    ONLINE_ORDER:
+      position:
+        x: -470
+        "y": -60
+      tempMetlId: 1
+    INSTORE_ORDER:
+      position:
+        x: -470
+        "y": 90
+      tempMetlId: 2
+    Unite:
+      position:
+        x: -290
+        "y": 10
+      tempMetlId: 3
+    Rewrite Table:
+      position:
+        x: -130
+        "y": 10
+      tempMetlId: 4
