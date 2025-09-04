@@ -56,44 +56,25 @@ pipeline:
         castTypes: "Yes"
         addSourceComponentColumn: "No"
         removeDuplicates: "Yes"
-    Rewrite Table BOOKS1_MINUS_S2:
+    Rewrite Table:
       type: "rewrite-table"
       sources:
       - "Except"
       parameters:
-        componentName: "Rewrite Table BOOKS1_MINUS_S2"
+        componentName: "Rewrite Table"
         warehouse: "COMPUTE_WH"
         database: "DEMODATABASE"
         schema: "DEMOSCHEMA"
-        targetTable: "BOOKS1_MINUS_S2"
+        targetTable: "ExceptBookS1_S2"
         orderBy:
-    Rewrite Table BOOKS1_UNION_S2:
-      type: "rewrite-table"
-      sources:
-      - "Unite"
-      parameters:
-        componentName: "Rewrite Table BOOKS1_UNION_S2"
-        warehouse: "COMPUTE_WH"
-        database: "DEMODATABASE"
-        schema: "DEMOSCHEMA"
-        targetTable: "BOOKS1_UNION_S2"
-        orderBy:
-    Rewrite Table BOOKS1_INT_S2:
-      type: "rewrite-table"
-      sources:
-      - "Intersect"
-      parameters:
-        componentName: "Rewrite Table BOOKS1_INT_S2"
-        warehouse: "COMPUTE_WH"
-        database: "DEMODATABASE"
-        schema: "DEMOSCHEMA"
-        targetTable: "BOOKS1_INT_S2"
-        orderBy:
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
 design:
   components:
     BOOKS1:
       position:
-        x: 210
+        x: 208
         "y": 80
       tempMetlId: 9410
     BOOKS2:
@@ -109,25 +90,15 @@ design:
     Intersect:
       position:
         x: 560
-        "y": 128
+        "y": 130
       tempMetlId: 9469
     Unite:
       position:
         x: 560
         "y": 256
       tempMetlId: 9471
-    Rewrite Table BOOKS1_MINUS_S2:
+    Rewrite Table:
       position:
         x: 720
         "y": 0
-      tempMetlId: 9565
-    Rewrite Table BOOKS1_UNION_S2:
-      position:
-        x: 720
-        "y": 256
-      tempMetlId: 9568
-    Rewrite Table BOOKS1_INT_S2:
-      position:
-        x: 720
-        "y": 128
-      tempMetlId: 9570
+      tempMetlId: 9472
