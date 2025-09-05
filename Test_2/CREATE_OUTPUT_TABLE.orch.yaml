@@ -1,0 +1,69 @@
+type: "orchestration"
+version:
+pipeline:
+  components:
+    Start:
+      type: "start"
+      transitions:
+        unconditional:
+        - "Create Output Table"
+      parameters:
+        componentName: "Start"
+    Create Output Table:
+      type: "create-table-v2"
+      parameters:
+        componentName: "Create Output Table"
+        createMethod: "Replace"
+        database: "DEMODATABASE"
+        schema: "DEMOSCHEMA"
+        table: "UNION_FILTERED_RESULTS"
+        snowflakeTableType: "Permanent"
+        columns:
+        - - "CUSTOMER_ID"
+          - "NUMBER"
+          - "38"
+          - "0"
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "CUSTOMER_NAME"
+          - "VARCHAR"
+          - "100"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "ORDER_DATE"
+          - "DATE"
+          - ""
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "AMOUNT"
+          - "NUMBER"
+          - "10"
+          - "2"
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+design:
+  components:
+    Create Output Table:
+      position:
+        x: 160
+        "y": 0
+      tempMetlId:
+    Start:
+      position:
+        x: 0
+        "y": 0
+      tempMetlId:

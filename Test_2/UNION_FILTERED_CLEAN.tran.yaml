@@ -1,11 +1,11 @@
 type: "transformation"
-version: "1.0"
+version:
 pipeline:
   components:
-    ONLINE_ORDER:
+    Online Orders:
       type: "table-input"
       parameters:
-        componentName: "ONLINE_ORDER"
+        componentName: "Online Orders"
         database: "DEMODATABASE"
         schema: "DEMOSCHEMA"
         targetTable: "ONLINE_ORDER"
@@ -14,11 +14,10 @@ pipeline:
         - "CUSTOMER_NAME"
         - "ORDER_DATE"
         - "AMOUNT"
-        timeOffset:
-    INSTORE_ORDER:
+    Instore Orders:
       type: "table-input"
       parameters:
-        componentName: "INSTORE_ORDER"
+        componentName: "Instore Orders"
         database: "DEMODATABASE"
         schema: "DEMOSCHEMA"
         targetTable: "INSTORE_ORDER"
@@ -27,64 +26,63 @@ pipeline:
         - "CUSTOMER_NAME"
         - "ORDER_DATE"
         - "AMOUNT"
-        timeOffset:
-    Unite:
+    Combine Orders:
       type: "unite"
       sources:
-      - "ONLINE_ORDER"
-      - "INSTORE_ORDER"
+      - "Instore Orders"
+      - "Online Orders"
       parameters:
-        componentName: "Unite"
+        componentName: "Combine Orders"
         method: "Overlapping Columns"
         castTypes: "Yes"
         addSourceComponentColumn: "No"
         removeDuplicates: "Yes"
-    Output Results:
-      type: "rewrite-table"
-      sources:
-      - "Filter Amounts"
-      parameters:
-        componentName: "Output Results"
-        warehouse: "[Environment Default]"
-        database: "[Environment Default]"
-        schema: "[Environment Default]"
-        targetTable: "UNION_FILTERED_RESULTS"
-    Filter Amounts:
+    Filter Low Amounts:
       type: "filter"
       sources:
-      - "Unite"
+      - "Combine Orders"
       parameters:
-        componentName: "Filter Amounts"
+        componentName: "Filter Low Amounts"
         filterConditions:
         - - "AMOUNT"
           - "Is"
           - "Less than"
           - "2000"
         combineCondition: "And"
+    Save Results:
+      type: "rewrite-table"
+      sources:
+      - "Filter Low Amounts"
+      parameters:
+        componentName: "Save Results"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "UNION_FILTERED_RESULTS"
 design:
   components:
-    ONLINE_ORDER:
+    Online Orders:
       position:
-        x: -470
-        "y": -60
+        x: 0
+        "y": 0
       tempMetlId:
-    INSTORE_ORDER:
+    Instore Orders:
       position:
-        x: -470
-        "y": 90
+        x: 0
+        "y": 100
       tempMetlId:
-    Unite:
+    Combine Orders:
       position:
-        x: -290
-        "y": 10
+        x: 160
+        "y": 60
       tempMetlId:
-    Output Results:
+    Filter Low Amounts:
       position:
-        x: 40
-        "y": 120
+        x: 320
+        "y": 60
       tempMetlId:
-    Filter Amounts:
+    Save Results:
       position:
-        x: -120
-        "y": 120
+        x: 480
+        "y": 60
       tempMetlId:
