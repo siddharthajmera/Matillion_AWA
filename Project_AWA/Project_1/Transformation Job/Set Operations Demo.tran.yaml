@@ -1,0 +1,127 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    TABLE_A:
+      type: "table-input"
+      parameters:
+        componentName: "TABLE_A"
+        database: "[Environment Default]"
+        schema: "SRC"
+        targetTable: "TABLE_A"
+        columnNames:
+        - "DATA_VALUE"
+        timeOffset: ""
+    TABLE_B:
+      type: "table-input"
+      parameters:
+        componentName: "TABLE_B"
+        database: "[Environment Default]"
+        schema: "SRC"
+        targetTable: "TABLE_B"
+        columnNames:
+        - "DATA_VALUE"
+        timeOffset: ""
+    Except:
+      type: "except"
+      sources:
+      - "TABLE_A"
+      - "TABLE_B"
+      parameters:
+        componentName: "Except"
+        castTypes: "Yes"
+        primaryTable: "Replicate Table_A"
+    Intersect:
+      type: "intersect"
+      sources:
+      - "TABLE_A"
+      - "TABLE_B"
+      parameters:
+        componentName: "Intersect"
+        castTypes: "Yes"
+    Unite:
+      type: "unite"
+      sources:
+      - "TABLE_A"
+      - "TABLE_B"
+      parameters:
+        componentName: "Unite"
+        method: "Overlapping Columns"
+        castTypes: "Yes"
+        addSourceComponentColumn: "No"
+        removeDuplicates: "Yes"
+    Rewrite Table TABLE_A_MINUS_B:
+      type: "rewrite-table"
+      sources:
+      - "Except"
+      parameters:
+        componentName: "Rewrite Table TABLE_A_MINUS_B"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "SRC"
+        targetTable: "TABLE_A_MINUS_B"
+        orderBy:
+    Rewrite Table TABLE_A_UNION_B:
+      type: "rewrite-table"
+      sources:
+      - "Unite"
+      parameters:
+        componentName: "Rewrite Table TABLE_A_UNION_B"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "SRC"
+        targetTable: "TABLE_A_UNION_B"
+        orderBy:
+    Rewrite Table TABLE_A_INT_B:
+      type: "rewrite-table"
+      sources:
+      - "Intersect"
+      parameters:
+        componentName: "Rewrite Table TABLE_A_INT_B"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "SRC"
+        targetTable: "TABLE_A_INT_B"
+        orderBy:
+design:
+  components:
+    TABLE_A:
+      position:
+        x: 208
+        "y": 80
+      tempMetlId: 9410
+    TABLE_B:
+      position:
+        x: 208
+        "y": 208
+      tempMetlId: 9414
+    Except:
+      position:
+        x: 560
+        "y": 0
+      tempMetlId: 9467
+    Intersect:
+      position:
+        x: 560
+        "y": 128
+      tempMetlId: 9469
+    Unite:
+      position:
+        x: 560
+        "y": 256
+      tempMetlId: 9471
+    Rewrite Table TABLE_A_MINUS_B:
+      position:
+        x: 720
+        "y": 0
+      tempMetlId: 9565
+    Rewrite Table TABLE_A_UNION_B:
+      position:
+        x: 720
+        "y": 256
+      tempMetlId: 9568
+    Rewrite Table TABLE_A_INT_B:
+      position:
+        x: 720
+        "y": 128
+      tempMetlId: 9570
