@@ -1,0 +1,37 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start:
+      type: "start"
+      transitions:
+        unconditional:
+        - "SQL Script"
+      parameters:
+        componentName: "Start"
+    SQL Script:
+      type: "sql-executor"
+      parameters:
+        componentName: "SQL Script"
+        scriptLocation: "Component"
+        declareSqlVariables: "Include selected"
+        variablesToInclude:
+        sqlScript: "create or REPLACE TABLE TRANSACTIONS_NEW(\r\ntrans_id INT,\t\r\
+          \naccount_id\tINT,\r\nDate\tDATE,\r\nType\tVARCHAR(30),\r\noperation\tVARCHAR(40),\r\
+          \namount\tINT,\r\nbalance\tFLOAT,\r\nPurpose\tVARCHAR(40),\r\nbank\tVARCHAR(45),\r\
+          \naccount_partern_id VARCHAR(50));"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+design:
+  components:
+    Start:
+      position:
+        x: -430
+        "y": -10
+      tempMetlId: 1
+    SQL Script:
+      position:
+        x: -270
+        "y": -10
+      tempMetlId: 2
