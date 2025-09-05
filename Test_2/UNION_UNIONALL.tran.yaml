@@ -42,17 +42,29 @@ pipeline:
     Rewrite Table:
       type: "rewrite-table"
       sources:
-      - "Unite"
+      - "Filter"
       parameters:
         componentName: "Rewrite Table"
         warehouse: "COMPUTE_WH"
         database: "DEMODATABASE"
         schema: "DEMOSCHEMA"
-        targetTable: "AfterRemoveDuplicates"
+        targetTable: "REWRITE"
         orderBy:
       postProcessing:
         updateOutputMessage:
         updateScalarVariables:
+    Filter:
+      type: "filter"
+      sources:
+      - "Unite"
+      parameters:
+        componentName: "Filter"
+        filterConditions:
+        - - "AMOUNT"
+          - "Is"
+          - "Less than"
+          - "2000"
+        combineCondition: "And"
 design:
   components:
     ONLINE_ORDER:
@@ -72,6 +84,11 @@ design:
       tempMetlId: 3
     Rewrite Table:
       position:
-        x: -130
+        x: -90
         "y": 10
       tempMetlId: 4
+    Filter:
+      position:
+        x: -180
+        "y": -10
+      tempMetlId: 5
